@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { deleteStorageFiles } from "@/utils/storageCleanup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,10 +40,10 @@ interface HeroContent {
 }
 
 const defaultHeroContent: HeroContent = {
-  chipText: "Chapter 1 — Innovation Begins Here",
+  chipText: "Jharkhand's Societal Innovation Portal",
   title: "Samanvay",
-  subtitle: "Build Solutions for Societal Challenges",
-  frontImage: "/front.png",
+  subtitle: "Connecting Citizens, Universities & Industry to Solve Real Societal Challenges",
+  frontImage: "/logo.jpeg",
   backImage: "/back.png",
   sliderImages: [
     "/BackgroundSlider1.jpeg",
@@ -152,7 +152,7 @@ export function HeroSection() {
       const entry = {
         page_name: "home",
         section_key: "hero",
-        content: editContent,
+        content: editContent as any,
         tenant_id: tenant!.id,
         updated_at: new Date().toISOString(),
       };
@@ -189,11 +189,9 @@ export function HeroSection() {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData, error: urlError } = await supabase.storage
+      const { data: urlData } = await supabase.storage
         .from("resources")
         .getPublicUrl(filePath);
-
-      if (urlError) throw urlError;
 
       setEditContent((current) => ({ ...current, [field]: urlData.publicUrl }));
       toast.success("Image uploaded successfully.");
@@ -217,11 +215,9 @@ export function HeroSection() {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData, error: urlError } = await supabase.storage
+      const { data: urlData } = await supabase.storage
         .from("resources")
         .getPublicUrl(filePath);
-
-      if (urlError) throw urlError;
 
       setEditContent((current) => ({
         ...current,
@@ -275,9 +271,9 @@ export function HeroSection() {
       </div>
 
         <div className="container mx-auto px-4 py-20 relative z-30">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Left Content */}
-          <div className="text-center lg:text-left space-y-6">
+        <div className="max-w-3xl mx-auto">
+          {/* Hero Content */}
+          <div className="text-center space-y-6">
             <div className="inline-block">
               <span className="bg-secondary/20 text-secondary px-4 py-1.5 rounded-full text-sm font-medium">
                 {displayedContent.chipText}
@@ -322,41 +318,6 @@ export function HeroSection() {
               </Button>
             )}
           </div>
-
-          {/* Right - 3D Rotating Advertisement */}
-          <div className="flex justify-center lg:justify-end">
-            <div
-              className="relative w-full max-w-[26rem] lg:max-w-[32rem] perspective-1000"
-              style={{ paddingTop: `${100 / cardAspectRatio}%` }}
-            >
-              <div className="absolute inset-0 animate-rotate-3d preserve-3d">
-                <div className="absolute inset-0 bg-white rounded-2xl shadow-elevated backface-hidden overflow-hidden">
-                  <img
-                    src={heroContent.frontImage}
-                    alt="Front"
-                    className="w-full h-full object-contain"
-                    onLoad={(event) => {
-                      const img = event.currentTarget;
-                      const ratio = img.naturalWidth / img.naturalHeight;
-                      if (ratio > 0) setCardAspectRatio(ratio);
-                    }}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-white rounded-2xl shadow-elevated rotate-y-180 backface-hidden overflow-hidden">
-                  <img
-                    src={heroContent.backImage}
-                    alt="Back"
-                    className="w-full h-full object-contain"
-                    onLoad={(event) => {
-                      const img = event.currentTarget;
-                      const ratio = img.naturalWidth / img.naturalHeight;
-                      if (ratio > 0) setCardAspectRatio(ratio);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {editing && (
@@ -390,7 +351,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontSize: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontSize: e.target.value as HeroContent["heroStyles"]["title"]["fontSize"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -405,7 +366,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontWeight: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontWeight: e.target.value as HeroContent["heroStyles"]["title"]["fontWeight"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -420,7 +381,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontStyle: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), fontStyle: e.target.value as HeroContent["heroStyles"]["title"]["fontStyle"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -436,7 +397,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), animation: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), title: { ...(c.heroStyles?.title || {}), animation: e.target.value as HeroContent["heroStyles"]["title"]["animation"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -467,7 +428,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontSize: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontSize: e.target.value as NonNullable<HeroContent["heroStyles"]["subtitle"]>["fontSize"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -482,7 +443,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontWeight: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontWeight: e.target.value as NonNullable<HeroContent["heroStyles"]["subtitle"]>["fontWeight"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -497,7 +458,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontStyle: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), fontStyle: e.target.value as NonNullable<HeroContent["heroStyles"]["subtitle"]>["fontStyle"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
@@ -513,7 +474,7 @@ export function HeroSection() {
                       onChange={(e) =>
                         setEditContent((c) => ({
                           ...c,
-                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), animation: e.target.value } },
+                          heroStyles: { ...(c.heroStyles || {}), subtitle: { ...(c.heroStyles?.subtitle || {}), animation: e.target.value as NonNullable<HeroContent["heroStyles"]["subtitle"]>["animation"] } },
                         }))
                       }
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"

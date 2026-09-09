@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,34 +30,34 @@ interface PageTextContent {
 }
 
 const defaultPageText: PageTextContent = {
-  title: "Resources",
-  subtitle: "Download templates, guidelines, and everything you need for your submission.",
+  title: "Resources & Guidelines",
+  subtitle: "Download templates, submission guidelines, and reference documents for citizens, universities, and industry partners.",
 };
 
 const faqs = [
   {
-    question: "Who can participate in Samanvay?",
-    answer: "Any student currently enrolled in GCET across all departments can participate. Teams must have 3-5 members.",
+    question: "Who can submit a societal challenge on Samanvay?",
+    answer: "Any citizen, community organisation, Panchayati Raj Institution, Urban Local Body, NGO, FPO, SHG, or government department across Jharkhand can submit challenges through the portal.",
   },
   {
-    question: "Can we form cross-department teams?",
-    answer: "Yes! Cross-functional teams from different departments are encouraged as they bring diverse perspectives.",
+    question: "How does the platform categorise submitted challenges?",
+    answer: "An AI-enabled classification system automatically categorises challenges into thematic domains such as education, agriculture, healthcare, water resources, environment, energy, urban development, accessibility, public administration, and rural livelihoods.",
   },
   {
-    question: "What is the registration fee?",
-    answer: "Participation is free of cost. There are no registration fees for Samanvay.",
+    question: "How are challenges routed to universities?",
+    answer: "Validated challenges are matched to appropriate Higher Education Institutions based on their academic disciplines, research expertise, innovation centres, incubation facilities, and faculty specialisation.",
   },
   {
-    question: "Can we change our problem statement after registration?",
-    answer: "Problem statement changes are allowed until Phase 1 deadline. Contact the organizers for assistance.",
+    question: "Can industry partners participate?",
+    answer: "Yes. Industries, startups, MSMEs, CSR organisations, research laboratories, and innovation hubs can participate as collaboration partners for mentorship, co-development, funding, prototyping, pilot implementation, and technology transfer.",
   },
   {
-    question: "What kind of prototypes are expected?",
-    answer: "Prototypes can be hardware, software, or hybrid. The focus is on demonstrating your solution's feasibility.",
+    question: "How is project progress tracked?",
+    answer: "The platform provides a project lifecycle management system monitoring milestones, deliverables, approvals, documentation, testing outcomes, IP generation, and implementation status. Government dashboards provide real-time analytics.",
   },
   {
-    question: "Will mentorship be provided?",
-    answer: "Yes, registered teams get access to faculty mentors and industry experts throughout the event.",
+    question: "What multimedia evidence can be submitted with a challenge?",
+    answer: "Citizens can upload photographs, videos, location details (GPS coordinates), and relevant supporting documents when submitting societal challenges through the web interface.",
   },
 ];
 

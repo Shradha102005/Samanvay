@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Search, ArrowRight, GraduationCap, Users, Lightbulb, AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
+import { Search, ArrowRight, GraduationCap, Users, Lightbulb, AlertCircle, Plus, Edit, Trash2, Building2, Landmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
 import { ProblemFormDialog } from "@/components/admin/ProblemFormDialog";
@@ -15,20 +15,25 @@ import { fetchProblemsUnlockAt } from "@/lib/contestSettings";
 
 // Default theme metadata used when a tenant has no custom themes
 const DEFAULT_THEME_META: { [key: string]: { icon: any; description: string; color: string } } = {
-  Academic: {
-    icon: GraduationCap,
-    description: "Problems related to teaching, learning, examinations, and academic infrastructure.",
+  Corporates: {
+    icon: Building2,
+    description: "Challenges submitted by corporate organisations, MSMEs, and private sector entities seeking innovative solutions.",
     color: "bg-primary",
   },
-  "Non-Academic": {
-    icon: Users,
-    description: "Problems related to campus operations, administration, and student services.",
+  "Govt. Organizations": {
+    icon: Landmark,
+    description: "Challenges from government departments, local bodies, Panchayati Raj Institutions, and public agencies.",
     color: "bg-secondary",
   },
-  "Community Innovation": {
-    icon: Lightbulb,
-    description: "Problems addressing societal challenges and community development.",
+  "Academic Institutions": {
+    icon: GraduationCap,
+    description: "Challenges identified by universities, colleges, research centres, and educational bodies.",
     color: "bg-accent",
+  },
+  Others: {
+    icon: Users,
+    description: "Challenges submitted by NGOs, SHGs, FPOs, community groups, and individual citizens.",
+    color: "bg-muted-foreground",
   },
 };
 
@@ -352,19 +357,19 @@ export default function Problems() {
       <section className="bg-primary py-16 lg:py-24">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl lg:text-5xl font-poppins font-bold text-primary-foreground">
-            Problem Statements
+            Societal Challenge Statements
           </h1>
           <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto">
-            Explore real-world challenges across three distinct themes. Choose a problem that resonates with you and build innovative solutions.
+            Browse validated challenges submitted by citizens, community organisations, local bodies, and government agencies across Jharkhand. Each statement is an opportunity for universities and industry to innovate.
           </p>
           <div className="mt-6 flex justify-center gap-8 text-primary-foreground">
             <div className="text-center">
               <span className="text-3xl font-bold">{problems.length}</span>
-              <p className="text-sm">Total Problems</p>
+              <p className="text-sm">Total Challenges</p>
             </div>
             <div className="text-center">
               <span className="text-3xl font-bold">{themes.length}</span>
-              <p className="text-sm">Themes</p>
+              <p className="text-sm">Domains</p>
             </div>
           </div>
           {isAdmin && (
@@ -383,36 +388,36 @@ export default function Problems() {
 
       {isUnlocked ? (
         <>
-          {/* Theme Cards */}
+          {/* Category Cards */}
           <section className="py-12 bg-highlight">
             <div className="container mx-auto px-4">
               <h2 className="text-xl font-poppins font-semibold text-foreground text-center mb-8">
-                Select a Theme
+                Select a Problem Statement from the below categories
               </h2>
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {themes.map((theme) => {
                   const Icon = getThemeIcon(theme.name);
                   const isActive = activeTheme === theme.name;
                   return (
                     <button
-                      key={theme.id}
+                      key={theme.id ?? theme.name}
                       onClick={() => setActiveTheme(isActive ? "All" : theme.name)}
                       className={`p-6 rounded-3xl border-2 transition-all text-left ${isActive
                         ? "border-secondary bg-secondary/5 shadow-lg"
                         : "border-border bg-card hover:border-secondary/50 hover:shadow-md"
                         }`}
                     >
-                      <div className={`w-12 h-12 rounded-lg ${theme.color} flex items-center justify-center mb-4`}>
+                      <div className={`w-12 h-12 rounded-lg ${theme.color ?? DEFAULT_THEME_META[theme.name]?.color ?? "bg-primary"} flex items-center justify-center mb-4`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <h3 className="font-poppins font-semibold text-lg text-foreground mb-2">
                         {theme.name}
                       </h3>
                       <p className="text-muted-foreground text-sm mb-3">
-                        {DEFAULT_THEME_META[theme.name]?.description || "Problems under this theme."}
+                        {DEFAULT_THEME_META[theme.name]?.description || "Challenges under this category."}
                       </p>
                       <span className="text-secondary font-medium text-sm">
-                        {problemCounts[theme.name]} Problems
+                        {problemCounts[theme.name]} Challenges
                       </span>
                     </button>
                   );
@@ -568,6 +573,24 @@ export default function Problems() {
                               View Details
                               <ArrowRight className="w-4 h-4 ml-1" />
                             </Button>
+                            {!isAdmin && (
+                              <Button
+                                asChild
+                                size="sm"
+                                variant="default"
+                                className="w-full"
+                                disabled={
+                                  problem.max_registrations != null &&
+                                  (problem.curr_registrations ?? 0) >= problem.max_registrations
+                                }
+                              >
+                                <Link
+                                  to={tenantPath(tenant!.slug, `/registration?problem=${problem.problem_statement_id}`)}
+                                >
+                                  Apply
+                                </Link>
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -629,10 +652,10 @@ export default function Problems() {
         <section className="py-12 bg-primary">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl font-poppins font-bold text-primary-foreground mb-4">
-              Ready to Solve a Problem?
+              Have a Societal Challenge?
             </h2>
             <p className="text-primary-foreground/80 mb-6 max-w-xl mx-auto">
-              Register your team and start working on your innovative solution today.
+              Citizens, Panchayats, NGOs, ULBs, and government departments can submit challenges for evaluation by universities and industry partners.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button
@@ -641,10 +664,10 @@ export default function Problems() {
                 size="lg"
                 className="border-2 border-white/90 text-white hover:bg-white hover:text-primary transition-all duration-200"
               >
-                <Link to={tenantPath(tenant!.slug, "/resources")}>Download Resources</Link>
+                <Link to={tenantPath(tenant!.slug, "/resources")}>Download Guidelines</Link>
               </Button>
               <Button asChild variant="orange" size="lg">
-                <Link to={tenantPath(tenant!.slug, "/registration")}>Register Now</Link>
+                <Link to={tenantPath(tenant!.slug, "/submit-problem")}>Submit a Challenge</Link>
               </Button>
             </div>
           </div>
@@ -751,6 +774,30 @@ export default function Problems() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              {/* Incentives Section */}
+              <div className="mt-6 rounded-3xl border border-secondary/30 bg-secondary/5 overflow-hidden">
+                <div className="px-5 py-4 bg-secondary/10 border-b border-secondary/20 flex items-center gap-2">
+                  <span className="text-lg">🏆</span>
+                  <h3 className="font-poppins font-semibold text-base text-foreground">
+                    Incentives & Benefits
+                  </h3>
+                </div>
+                <div className="px-5 py-5 grid sm:grid-cols-2 gap-3">
+                  {[
+                    { icon: "🎓", text: "Academic credit & recognition for student-faculty teams" },
+                    { icon: "💰", text: "Potential funding & grants for proof-of-concept and prototyping" },
+                    { icon: "🤝", text: "Industry mentorship and co-development partnerships" },
+                    { icon: "📜", text: "IP registration support for innovative solutions developed" },
+                    { icon: "🚀", text: "Incubation and startup support for scalable solutions" },
+                    { icon: "🌍", text: "Real-world deployment and measurable community impact" },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-start gap-3 bg-background rounded-xl px-4 py-3 border border-border">
+                      <span className="text-xl shrink-0">{item.icon}</span>
+                      <p className="text-sm text-muted-foreground leading-snug">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}

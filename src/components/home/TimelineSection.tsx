@@ -68,47 +68,47 @@ const iconLibrary: Record<string, React.ElementType> = {
 const fallbackIcons = [Target, Users, Rocket, Check, Award];
 
 const defaultTimelineHeader: TimelineHeader = {
-  label: "Event Journey",
-  title: "Your Path to Innovation",
-  subtitle: "",
+  label: "Platform Journey",
+  title: "How It Works",
+  subtitle: "A transparent end-to-end innovation lifecycle — from community-identified challenges to real-world deployed solutions.",
   photo_url: null,
   photo_urls: [],
 };
 
 const defaultTimelineCards: TimelineCard[] = [
   {
-    id: "phase-0",
-    name: "Phase 0",
-    title: "Problem Discovery",
-    description: "Identify and document real campus challenges through observation and research.",
-    image_urls: [],
-  },
-  {
     id: "phase-1",
-    name: "Phase 1",
-    title: "Team Formation & Registration",
-    description: "Form cross-functional teams and register with your chosen problem statement.",
+    name: "Step 1",
+    title: "Challenge Submission",
+    description: "Citizens, Panchayats, ULBs, NGOs, and government departments submit local societal challenges with multimedia evidence, location data, and supporting documents through the portal.",
     image_urls: [],
   },
   {
     id: "phase-2",
-    name: "Phase 2",
-    title: "Solution Ideation",
-    description: "Brainstorm, validate, and refine your innovative solution approach.",
+    name: "Step 2",
+    title: "AI Categorisation & Validation",
+    description: "The platform automatically categorises submitted challenges by thematic domain — education, healthcare, agriculture, water, sanitation, environment — prioritises them, and removes duplicates.",
     image_urls: [],
   },
   {
     id: "phase-3",
-    name: "Phase 3",
-    title: "Prototype Development",
-    description: "Build working prototypes and prepare comprehensive documentation.",
+    name: "Step 3",
+    title: "University Routing & Evaluation",
+    description: "Validated challenges are routed to appropriate Higher Education Institutions based on academic disciplines, research expertise, and faculty specialisation. Universities form multidisciplinary teams and prepare solution proposals.",
     image_urls: [],
   },
   {
     id: "phase-4",
-    name: "Phase 4",
-    title: "Final Pitch & Evaluation",
-    description: "Present your solution to the jury and compete for recognition and prizes.",
+    name: "Step 4",
+    title: "Industry Collaboration",
+    description: "Industries, startups, MSMEs, CSR organisations, and research labs collaborate with university teams for mentorship, co-development, funding, prototyping, and pilot implementation.",
+    image_urls: [],
+  },
+  {
+    id: "phase-5",
+    name: "Step 5",
+    title: "Deployment & Impact Tracking",
+    description: "Solutions are tested, validated, and deployed in the community. Government dashboards track outcomes including challenge resolution rates, patents generated, startups created, and measurable social impact across districts.",
     image_urls: [],
   },
 ];

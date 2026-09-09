@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Upload } from "lucide-react";
@@ -36,6 +36,7 @@ export default function Registration() {
   const { isAdmin } = useAdmin();
   const { tenant } = useTenant();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -144,6 +145,22 @@ export default function Registration() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant?.id]);
+
+  // Pre-fill problem ID from URL ?problem= query param (e.g. from Apply button)
+  useEffect(() => {
+    const psFromUrl = searchParams.get("problem");
+    if (!psFromUrl || !tenant?.id) return;
+    // Set immediately so the input shows the value
+    setProblemId(psFromUrl);
+    // Validate asynchronously
+    setIsValidatingProblemId(true);
+    validateAndResolveProblemId(psFromUrl).then(({ error, uuid }) => {
+      setProblemIdError(error);
+      setResolvedProblemUuid(uuid);
+      setIsValidatingProblemId(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, tenant?.id]);
 
   // Save form state to localStorage with debounce
   useEffect(() => {
@@ -485,10 +502,10 @@ export default function Registration() {
       <section className="bg-primary py-16 lg:py-24">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl lg:text-5xl font-poppins font-bold text-primary-foreground">
-            Team Registration
+            University / Research Team Registration
           </h1>
           <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto">
-            Register your team. Fill in all the required details below.
+            Register your institution or research team to collaborate on validated societal challenges. Fill in all the required details below.
           </p>
         </div>
       </section>

@@ -51,8 +51,8 @@ export default function Contact() {
   const { tenant } = useTenant();
   const defaultHeader: ContactHeader = {
     title: "Contact Us",
-    subtitle: "Have questions? Reach out to our organizing team for assistance.",
-    organizingTitle: "Organizing Team",
+    subtitle: "Have questions about the platform? Reach out to the Samanvay coordination team for assistance.",
+    organizingTitle: "Coordination Team",
     enquiriesTitle: "General Enquiries",
     styles: {
       backgroundColor: "#0b3a82",
@@ -211,21 +211,21 @@ const entries = [
   {
     page_name: "contact",
     section_key: "coordinators",
-    content: editCoordinators,
+    content: editCoordinators as any,
     tenant_id: tenant!.id,
     updated_at: new Date().toISOString(),
   },
   {
     page_name: "contact",
     section_key: "contact_header",
-    content: editHeader,
+    content: editHeader as any,
     tenant_id: tenant!.id,
     updated_at: new Date().toISOString(),
   },
   {
     page_name: "contact",
     section_key: "general_enquiries",
-    content: editGeneralEnquiries,
+    content: editGeneralEnquiries as any,
     tenant_id: tenant!.id,
     updated_at: new Date().toISOString(),
   },

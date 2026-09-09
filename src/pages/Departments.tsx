@@ -244,19 +244,18 @@ export default function DepartmentsPage() {
     <Layout>
       <section className="bg-primary py-16 lg:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl lg:text-5xl font-poppins font-bold text-primary-foreground">Department Approvals</h1>
+          <h1 className="text-3xl lg:text-5xl font-poppins font-bold text-primary-foreground">Challenge Review & Approval</h1>
           <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto">
-            Explore departments and their challenges. Browse through different themes and categories to find problems
-            that align with your interests.
+            Review and approve submitted societal challenges by domain and category before routing them to appropriate Higher Education Institutions.
           </p>
           <div className="mt-6 flex justify-center gap-8 text-primary-foreground">
             <div className="text-center">
               <span className="text-3xl font-bold">{departments.length}</span>
-              <p className="text-sm">Total Departments</p>
+              <p className="text-sm">Departments</p>
             </div>
             <div className="text-center">
               <span className="text-3xl font-bold">{Object.keys(grouped || {}).length}</span>
-              <p className="text-sm">Themes</p>
+              <p className="text-sm">Domains</p>
             </div>
           </div>
         </div>
@@ -268,7 +267,7 @@ export default function DepartmentsPage() {
             {["Academic", "Non-Academic", "Community Innovation"].map((theme) => {
               const deptsMap = (grouped || {})[theme] || {};
               const count = Object.values(deptsMap || {}).reduce(
-                (s: number, dm: any) => s + Object.values(dm).reduce((t: number, arr: any) => t + (arr?.length || 0), 0),
+                (s: number, dm: any) => s + Number(Object.values(dm).reduce((t: number, arr: any) => t + (arr?.length || 0), 0)),
                 0
               );
 
@@ -422,7 +421,7 @@ export default function DepartmentsPage() {
                       <span className="text-sm text-muted-foreground">
                         {Object.values(deptsMap || {}).reduce(
                           (s: number, dm: any) =>
-                            s + Object.values(dm).reduce((t: number, arr: any) => t + (arr?.length || 0), 0),
+                            s + Number(Object.values(dm).reduce((t: number, arr: any) => t + (arr?.length || 0), 0)),
                           0
                         )}{" "}
                         problems

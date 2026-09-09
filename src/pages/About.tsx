@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteStorageFiles } from "@/utils/storageCleanup";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -40,15 +40,15 @@ interface AboutCard {
 const defaultHeader: PageHeader = {
   title: "What is Samanvay?",
   subtitle:
-    "Samanvay is a platform connecting organizations, universities, and industry to build solutions for societal challenges in Jharkhand.-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
-  teamTitle: "The Team",
-  teamSubtitle: "Behind Samanvay",
+    "Samanvay is a technology-enabled Societal Innovation Collaboration Portal that connects community challenges with Higher Education Institutions and industry partners to create measurable social impact across Jharkhand.",
+  teamTitle: "Our Stakeholders",
+  teamSubtitle: "Who Powers the Ecosystem",
 };
 
 const defaultDescriptiveBoxes: DescriptiveBox[] = [
   {
     id: "box-1",
-    text: "Samanvay is a platform connecting organizations, universities, and industry to build solutions for societal challenges in Jharkhand.-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
+    text: "Communities across Jharkhand face thousands of unresolved local challenges in education, healthcare, agriculture, water management, sanitation, environment, rural livelihoods, and urban infrastructure. Samanvay provides a centralised digital platform where these challenges are submitted, validated, and systematically routed to the right institutions for resolution.",
     fontSize: "lg",
     fontStyle: "default",
     fontWeight: "normal",
@@ -58,7 +58,7 @@ const defaultDescriptiveBoxes: DescriptiveBox[] = [
   },
   {
     id: "box-2",
-    text: "Through our structured 5D Framework — Discover, Define, Design, Develop, and Deliver — participants journey from problem identification to prototype creation, gaining invaluable entrepreneurial skills along the way.",
+    text: "Aligned with the National Education Policy (NEP) 2020, Samanvay bridges the gap between citizens, Higher Education Institutions (HEIs), and industry — fostering demand-driven innovation, experiential learning, and multidisciplinary collaboration that generates real, deployable solutions with measurable social outcomes.",
     fontSize: "lg",
     fontStyle: "default",
     fontWeight: "normal",
@@ -70,45 +70,45 @@ const defaultDescriptiveBoxes: DescriptiveBox[] = [
 
 const defaultTeamCards: AboutCard[] = [
   {
-    id: "geenovate",
-    title: "Geenovate Foundation",
+    id: "citizens",
+    title: "Citizens & Community Organisations",
     description:
-      "The driving force behind Samanvay, fostering innovation and entrepreneurship across GCET.",
+      "Individuals, Panchayati Raj Institutions, Urban Local Bodies, NGOs, FPOs, SHGs, and government departments who identify and submit societal challenges facing their communities.",
     image_url: null,
   },
   {
-    id: "patrons",
-    title: "Patrons & Leadership",
+    id: "heis",
+    title: "Higher Education Institutions",
     description:
-      "Chairman, Director, and institutional leaders providing vision and guidance.",
+      "Universities and colleges across Jharkhand that review assigned challenges, form multidisciplinary student-faculty teams, and develop research-backed solution proposals.",
     image_url: null,
   },
   {
-    id: "core",
-    title: "Core Organisers",
+    id: "industry",
+    title: "Industry & Innovation Partners",
     description:
-      "Head Coordinator and 5 Co-Coordinators managing event operations and participant experience.",
+      "Industries, startups, MSMEs, CSR organisations, research laboratories, and innovation hubs that provide mentorship, funding, prototyping support, and technology transfer.",
     image_url: null,
   },
   {
-    id: "support",
-    title: "Department Support Group",
+    id: "govt",
+    title: "Government Departments",
     description:
-      "Academic supporters from each department ensuring curriculum alignment and mentorship.",
+      "State government bodies and departments that monitor challenge submissions, institutional participation, project progress, and measurable social outcomes through real-time dashboards.",
     image_url: null,
   },
   {
-    id: "partners",
-    title: "Partner Clubs & Councils",
+    id: "platform",
+    title: "Platform & Technical Team",
     description:
-      "Innovation Council, Tech Clubs, and professional bodies collaborating for success.",
+      "The technical team powering the AI-enabled categorisation, routing, workflow management, communication systems, and analytics infrastructure of the Samanvay portal.",
     image_url: null,
   },
   {
-    id: "volunteers",
-    title: "Volunteers & Sponsors",
+    id: "mentors",
+    title: "Faculty Mentors & Experts",
     description:
-      "Dedicated student volunteers and external sponsors making this event possible.",
+      "Specialised faculty mentors, domain experts, and industry professionals who guide university teams through the project lifecycle from problem evaluation to solution deployment.",
     image_url: null,
   },
 ];
