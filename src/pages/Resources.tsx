@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ const defaultPageText: PageTextContent = {
 
 const faqs = [
   {
-    question: "Who can participate in inCamp?",
+    question: "Who can participate in Samanvay?",
     answer: "Any student currently enrolled in GCET across all departments can participate. Teams must have 3-5 members.",
   },
   {
@@ -45,7 +45,7 @@ const faqs = [
   },
   {
     question: "What is the registration fee?",
-    answer: "Participation is free of cost. There are no registration fees for inCamp Chapter 1.",
+    answer: "Participation is free of cost. There are no registration fees for Samanvay.",
   },
   {
     question: "Can we change our problem statement after registration?",

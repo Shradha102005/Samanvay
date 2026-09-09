@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FileText, UserPlus, Download } from "lucide-react";
 import { useTenant } from "@/context/TenantContext";
@@ -22,7 +22,7 @@ export function CTASection() {
             Ready to Innovate?
           </h2>
           <p className="mt-4 text-primary-foreground/80 text-lg">
-            Join inCamp Chapter 1 and transform your ideas into impactful solutions.
+            Join Samanvay and help solve real societal challenges across Jharkhand.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">

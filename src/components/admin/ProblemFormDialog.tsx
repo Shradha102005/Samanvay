@@ -111,7 +111,12 @@ export function ProblemFormDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(formData);
+    const limit = parseInt(formData.max_registrations as any, 10);
+    if (!formData.max_registrations || isNaN(limit) || limit < 1) {
+      alert("Max Registrations is required and must be at least 1.");
+      return;
+    }
+    await onSave({ ...formData, max_registrations: limit });
   };
 
   return (
@@ -134,14 +139,15 @@ export function ProblemFormDialog({
             />
           </div>
           <div>
-            <Label htmlFor="max_registrations">Max Registrations</Label>
+            <Label htmlFor="max_registrations">Max Registrations <span style={{color:'red'}}>*</span></Label>
             <Input
               id="max_registrations"
               type="number"
               min={1}
               value={formData.max_registrations as any}
               onChange={(e) => setFormData({ ...formData, max_registrations: e.target.value })}
-              placeholder="e.g., 10 (leave blank for unlimited)"
+              placeholder="e.g., 10"
+              required
             />
           </div>
           <div>

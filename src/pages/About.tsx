@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { deleteStorageFiles } from "@/utils/storageCleanup";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -38,17 +38,17 @@ interface AboutCard {
 }
 
 const defaultHeader: PageHeader = {
-  title: "What is inCamp?",
+  title: "What is Samanvay?",
   subtitle:
-    "inCamp is a student-driven innovation challenge designed to identify, analyse, and solve real-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
+    "Samanvay is a platform connecting organizations, universities, and industry to build solutions for societal challenges in Jharkhand.-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
   teamTitle: "The Team",
-  teamSubtitle: "Behind inCamp",
+  teamSubtitle: "Behind Samanvay",
 };
 
 const defaultDescriptiveBoxes: DescriptiveBox[] = [
   {
     id: "box-1",
-    text: "inCamp is a student-driven innovation challenge designed to identify, analyse, and solve real-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
+    text: "Samanvay is a platform connecting organizations, universities, and industry to build solutions for societal challenges in Jharkhand.-world problems within the campus ecosystem. We believe every challenge holds the seed of transformation.",
     fontSize: "lg",
     fontStyle: "default",
     fontWeight: "normal",
@@ -73,7 +73,7 @@ const defaultTeamCards: AboutCard[] = [
     id: "geenovate",
     title: "Geenovate Foundation",
     description:
-      "The driving force behind inCamp, fostering innovation and entrepreneurship across GCET.",
+      "The driving force behind Samanvay, fostering innovation and entrepreneurship across GCET.",
     image_url: null,
   },
   {

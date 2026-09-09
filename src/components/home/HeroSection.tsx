@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { deleteStorageFiles } from "@/utils/storageCleanup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,8 +41,8 @@ interface HeroContent {
 
 const defaultHeroContent: HeroContent = {
   chipText: "Chapter 1 — Innovation Begins Here",
-  title: "inCamp",
-  subtitle: "Turning Campus Challenges into Countable Change",
+  title: "Samanvay",
+  subtitle: "Build Solutions for Societal Challenges",
   frontImage: "/front.png",
   backImage: "/back.png",
   sliderImages: [

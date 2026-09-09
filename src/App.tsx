@@ -22,6 +22,10 @@ import NotFound from "./pages/NotFound";
 import EventDetails from "./pages/EventDetails";
 import EventRegister from "./pages/EventRegister";
 import ScrollToTop from "./components/ScrollToTop";
+import SubmitProblem from "./pages/SubmitProblem";
+import UniversityDashboard from "./pages/UniversityDashboard";
+import SubmissionsQueue from "./pages/SubmissionsQueue";
+import GovtAnalytics from "./pages/GovtAnalytics";
 
 const queryClient = new QueryClient();
 const defaultTenantSlug = "gcet";
@@ -59,6 +63,10 @@ const App = () => (
             <Route path="/departments" element={<LegacyTenantRedirect />} />
             <Route path="/admin" element={<LegacyTenantRedirect />} />
             <Route path="/profile" element={<LegacyTenantRedirect />} />
+            <Route path="/submit" element={<LegacyTenantRedirect />} />
+            <Route path="/university" element={<LegacyTenantRedirect />} />
+            <Route path="/submissions" element={<LegacyTenantRedirect />} />
+            <Route path="/analytics" element={<LegacyTenantRedirect />} />
             <Route path="/:tenantSlug" element={<TenantLayout />}>
               <Route index element={<Index />} />
               <Route path="about" element={<About />} />
@@ -71,6 +79,17 @@ const App = () => (
               <Route path="resources" element={<Resources />} />
               <Route path="registration" element={<Registration />} />
               <Route path="contact" element={<Contact />} />
+              <Route
+                path="submit"
+                element={
+                  <ProtectedRoute allowedRoles={["citizen", "govt_officer", "industry_partner"]}>
+                    <SubmitProblem />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="university" element={<UniversityDashboard />} />
+              <Route path="submissions" element={<SubmissionsQueue />} />
+              <Route path="analytics" element={<GovtAnalytics />} />
               <Route
                 path="profile"
                 element={

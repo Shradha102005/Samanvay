@@ -6,14 +6,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-signUp: (
-  email: string,
-  password: string,
-  name: string,
-  department: string,
-  year: string,
-  tenantId?: string
-) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+    role: string,
+    tenantId?: string
+  ) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -28,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -45,45 +44,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-const signUp = async (
-  email: string,
-  password: string,
-  name: string,
-  department: string,
-  year: string,
-  tenantId?: string
-) => {
-  const redirectUrl = `${window.location.origin}${window.location.pathname}`;
-
+  const signUp = async (
+    email: string,
+    password: string,
+    name: string,
+    role: string,
+    tenantId?: string
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
+        // No emailRedirectTo — instant account activation for the portal
         data: {
-            name,
-            department,
-            year,
-            tenant_id: tenantId,
+          name,
+          role,
+          tenant_id: tenantId,
         },
       },
     });
 
-    if (!error && data.user && tenantId) {
-      const { error: profileError } = await (supabase as any)
+    if (!error && data.user) {
+      // Create profile row immediately
+      const { error: profileError } = await supabase
         .from("profiles")
         .upsert(
           {
             id: data.user.id,
             email,
             name,
-            tenant_id: tenantId,
+            role: role as any,
+            tenant_id: tenantId || null,
           },
           { onConflict: "id" }
         );
 
       if (profileError) {
-        console.warn("Profile tenant assignment warning:", profileError.message);
+        console.warn("Profile creation warning:", profileError.message);
+      }
+
+      // Assign role in user_roles table
+      if (tenantId) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: data.user.id, role: role as any, tenant_id: tenantId });
+
+        if (roleError) {
+          console.warn("Role assignment warning:", roleError.message);
+        }
       }
     }
 
@@ -101,7 +109,6 @@ const signUp = async (
   const signOut = async () => {
     try {
       // Use 'local' scope to prevent 403 errors when the session is already expired.
-      // Global scope attempts to invalidate the token on the server, which fails if it's already expired.
       const { error } = await supabase.auth.signOut({ scope: "local" });
       if (error) {
         console.warn("Supabase sign out warning:", error.message);
@@ -109,11 +116,8 @@ const signUp = async (
     } catch (err) {
       console.error("Unexpected error during sign out:", err);
     } finally {
-      // Force clear local React state to prevent stale data
       setUser(null);
       setSession(null);
-      // Cleanly redirect to login page (which is the root "/")
-      // Using replace to prevent navigating back to a protected route
       const tenantSlug = window.location.pathname.split("/").filter(Boolean)[0];
       window.location.replace(tenantSlug ? `/${tenantSlug}` : "/");
     }

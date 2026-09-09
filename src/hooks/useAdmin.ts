@@ -7,6 +7,7 @@ export function useAdmin() {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDeptAdmin, setIsDeptAdmin] = useState(false);
+  const [isUniversityAdmin, setIsUniversityAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasAdminRoleElsewhere, setHasAdminRoleElsewhere] = useState(false);
   const { tenant } = useTenant();
@@ -33,8 +34,9 @@ export function useAdmin() {
         if (rolesError) throw rolesError;
 
         const roles = (rolesData || []).map((r: any) => String(r.role));
-        const hasAdminRole = roles.includes("admin") || roles.includes("institution_admin");
+        const hasAdminRole = roles.includes("admin") || roles.includes("institution_admin") || roles.includes("platform_admin");
         const hasDeptAdminRole = roles.includes("deptadmin") || roles.includes("department_admin");
+        const hasUniversityAdminRole = roles.includes("university_admin") || roles.includes("faculty_mentor");
 
         // Confirm the user's profile belongs to the active tenant.
         const { data: profileData, error: profileError } = await supabase
@@ -51,14 +53,22 @@ export function useAdmin() {
         if (hasAdminRole && hasCurrentTenantProfile) {
           setIsAdmin(true);
           setIsDeptAdmin(false);
+          setIsUniversityAdmin(false);
           setHasAdminRoleElsewhere(false);
         } else if (hasDeptAdminRole && hasCurrentTenantProfile) {
           setIsAdmin(false);
           setIsDeptAdmin(true);
+          setIsUniversityAdmin(false);
+          setHasAdminRoleElsewhere(false);
+        } else if (hasUniversityAdminRole && hasCurrentTenantProfile) {
+          setIsAdmin(false);
+          setIsDeptAdmin(false);
+          setIsUniversityAdmin(true);
           setHasAdminRoleElsewhere(false);
         } else {
           setIsAdmin(false);
           setIsDeptAdmin(false);
+          setIsUniversityAdmin(false);
           const { data: otherRoles } = await supabase
             .from("user_roles")
             .select("role")
@@ -67,7 +77,7 @@ export function useAdmin() {
 
           setHasAdminRoleElsewhere(
             (otherRoles || []).some((r: any) =>
-              ["admin", "institution_admin", "deptadmin", "department_admin"].includes(String(r.role))
+              ["admin", "platform_admin", "institution_admin", "deptadmin", "department_admin"].includes(String(r.role))
             )
           );
         }
@@ -84,5 +94,5 @@ export function useAdmin() {
     checkAdminRole();
   }, [user, tenant?.id]);
 
-  return { isAdmin, isDeptAdmin, loading, hasAdminRoleElsewhere };
+  return { isAdmin, isDeptAdmin, isUniversityAdmin, loading, hasAdminRoleElsewhere };
 }

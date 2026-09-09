@@ -1,20 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, LogOut, User, Shield } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User, Shield, ClipboardList, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useTenant } from "@/context/TenantContext";
 import { tenantPath } from "@/utils/tenantPath";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isUniversityAdmin } = useAdmin();
   const { tenant } = useTenant();
   const slug = tenant?.slug || "";
   const path = (value: string) => tenantPath(slug, value);
+
+  // Roles allowed to submit problems
+  const SUBMIT_ROLES = ["citizen", "govt_officer", "industry_partner", "admin", "platform_admin", "institution_admin"];
+  const [canSubmit, setCanSubmit] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setCanSubmit(false); return; }
+    // Admins can always submit (for testing)
+    if (isAdmin) { setCanSubmit(true); return; }
+    // Fetch profile role
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+        .then(({ data }) => {
+          setCanSubmit(SUBMIT_ROLES.includes(String(data?.role ?? "")));
+        });
+    });
+  }, [user, isAdmin]);
 
   const username = user
     ? (user.user_metadata?.full_name as string) ||
@@ -25,16 +43,22 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Home", path: path("/") },
-    { name: "About Us", path: path("/about") },
+    { name: "Problems", path: path("/problems") },
+    ...(canSubmit ? [{ name: "Submit Problem", path: path("/submit") }] : []),
     { name: "Events", path: path("/events") },
-    { name: "Problem Statements", path: path("/problems") },
     { name: "Resources", path: path("/resources") },
     ...(isAdmin
       ? [
-          { name: "Dashboard", path: path("/admin") },
+          { name: "Admin Dashboard", path: path("/admin") },
+          { name: "Submissions Queue", path: path("/submissions") },
+          { name: "Analytics", path: path("/analytics") },
           { name: "Approvals", path: path("/departments") },
         ]
-      : [{ name: "Registration", path: path("/registration") }]),
+      : []),
+    ...(isUniversityAdmin && !isAdmin
+      ? [{ name: "University Dashboard", path: path("/university") }]
+      : []),
+    { name: "About", path: path("/about") },
     { name: "Contact", path: path("/contact") },
   ];
 
@@ -52,19 +76,17 @@ export function Navbar() {
           {/* Logo */}
           <Link to={path("/")} className="flex items-center gap-2 shrink-0">
             <img
-              src="/favicon.png"
-              alt="inCamp Logo"
-              className="w-9 h-9 rounded-lg"
+              src="/logo.jpeg"
+              alt="Samanvay Logo"
+              className="h-12 w-auto object-contain"
             />
-            <span className="font-semibold text-lg hidden sm:block">
-              inCamp
-            </span>
           </Link>
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3 whitespace-nowrap">
             {user ? (
               <>
+                <NotificationBell />
                 <Button
                   asChild
                   variant="ghost"
@@ -110,13 +132,15 @@ export function Navbar() {
         {/* ================= BOTTOM ROW (DESKTOP NAV) ================= */}
         <nav className="hidden md:flex h-12 items-center justify-center gap-6 bg-muted/40">
 
-          {navLinks.map((link) => (
+          {navLinks.map((link: any) => (
             <Link
               key={link.path}
               to={link.path}
               className={`px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap transition ${
                 location.pathname === link.path
                   ? "bg-primary text-primary-foreground"
+                  : link.highlight
+                  ? "bg-orange-500 text-white hover:bg-orange-600"
                   : "text-foreground hover:bg-accent"
               }`}
             >

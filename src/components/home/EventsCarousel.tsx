@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar, Clock, MapPin } from "lucide-react";
@@ -207,7 +207,7 @@ export function EventsCarousel() {
             Upcoming Events
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-            Stay updated with the latest inCamp events, workshops, and important dates.
+            Stay updated with the latest Samanvay events, workshops, and important dates.
           </p>
           <p className="inline-flex items-center gap-2 text-sm text-slate-700 mt-4 rounded-full border border-slate-300/80 bg-white/70 px-4 py-1.5">
             <span className="h-2 w-2 rounded-full bg-orange-500" />

@@ -2,37 +2,55 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import type { Session } from "@supabase/supabase-js";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, Building2, GraduationCap, Users, Briefcase, ShieldCheck, User } from "lucide-react";
 import { useTenant } from "@/context/TenantContext";
 import { tenantPath } from "@/utils/tenantPath";
 
-const DEPARTMENT_ADMIN_URL = "https://depart-admin-portal.vercel.app/dashboard";
-
-const buildDepartmentAdminRedirectUrl = (session: Session) => {
-  const hashParams = new URLSearchParams({
-    access_token: session.access_token,
-    refresh_token: session.refresh_token,
-    token_type: session.token_type ?? "bearer",
-    expires_at: String(session.expires_at ?? ""),
-    provider_token: "",
-    provider_refresh_token: "",
-  });
-
-  return `${DEPARTMENT_ADMIN_URL}#${hashParams.toString()}`;
-};
-
-// Email validation function for GCET domain
-const validateGcetEmail = (email: string) => {
-  const gcetEmailRegex = /^[a-zA-Z0-9._%+-]+@gcet\.edu\.in$/;
-  return gcetEmailRegex.test(email);
-};
+// Role options for the platform
+const ROLE_OPTIONS = [
+  {
+    value: "student",
+    label: "Student / Researcher",
+    icon: GraduationCap,
+    description: "University student or research scholar",
+  },
+  {
+    value: "faculty_mentor",
+    label: "Faculty Mentor",
+    icon: Users,
+    description: "Faculty member mentoring student projects",
+  },
+  {
+    value: "university_admin",
+    label: "University Admin",
+    icon: Building2,
+    description: "Administrative representative of a university",
+  },
+  {
+    value: "industry_partner",
+    label: "Industry / Startup",
+    icon: Briefcase,
+    description: "Company, startup, MSME, or CSR organization",
+  },
+  {
+    value: "govt_officer",
+    label: "Government Officer",
+    icon: ShieldCheck,
+    description: "State / department government official",
+  },
+  {
+    value: "citizen",
+    label: "Citizen",
+    icon: User,
+    description: "Individual citizen or community member",
+  },
+];
 
 // Validation schemas
 const loginSchema = z.object({
@@ -40,17 +58,11 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string()
-    .email("Please enter a valid email address")
-    .refine(validateGcetEmail, {
-      message: "Only GCET college email IDs are allowed for registration.",
-    }),
-  department: z.string().min(1, "Please select your department"),
-  year: z.string().min(1, "Please select your year of study"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  role: z.string().min(1, "Please select your role"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -62,12 +74,10 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPostLoginRouting, setIsPostLoginRouting] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    department: "",
-    year: "",
+    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -81,8 +91,7 @@ export default function Auth() {
 
   const routeUserAfterLogin = useCallback(async (
     userId: string,
-    fallbackUrl: string,
-    sessionOverride?: Session | null
+    fallbackUrl: string
   ) => {
     const { data: roleRows, error: roleError } = await supabase
       .from("user_roles")
@@ -96,42 +105,31 @@ export default function Auth() {
       return;
     }
 
-    const isDeptAdmin = (roleRows || []).some(
-      (row) => String((row as { role?: unknown }).role) === "deptadmin"
-    );
+    const roles = (roleRows || []).map((r) => String((r as any).role));
 
-    if (isDeptAdmin) {
-      let activeSession = sessionOverride ?? session;
-      if (!activeSession) {
-        const { data } = await supabase.auth.getSession();
-        activeSession = data.session;
-      }
+    // Route based on role
+    if (roles.includes("admin") || roles.includes("platform_admin")) {
+      navigate(tenantPath(tenant?.slug || "", "/admin"), { replace: true });
+      return;
+    }
 
-      if (activeSession?.access_token && activeSession?.refresh_token) {
-        window.location.replace(buildDepartmentAdminRedirectUrl(activeSession));
-      } else {
-        window.location.replace(DEPARTMENT_ADMIN_URL);
-      }
-
+    if (roles.includes("university_admin") || roles.includes("faculty_mentor")) {
+      navigate(tenantPath(tenant?.slug || "", "/university"), { replace: true });
       return;
     }
 
     navigate(fallbackUrl, { replace: true });
-  }, [navigate, session, tenant?.id]);
+  }, [navigate, tenant?.id, tenant?.slug]);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (!user || isPostLoginRouting) {
-      return;
-    }
-
+    if (!user || isPostLoginRouting) return;
     void routeUserAfterLogin(user.id, homePath);
   }, [user, isPostLoginRouting, routeUserAfterLogin, homePath]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -145,15 +143,11 @@ export default function Auth() {
     try {
       if (isLogin) {
         setIsPostLoginRouting(true);
-
-        // Validate login
         const result = loginSchema.safeParse(formData);
         if (!result.success) {
           const fieldErrors: Record<string, string> = {};
           result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              fieldErrors[err.path[0] as string] = err.message;
-            }
+            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
           });
           setErrors(fieldErrors);
           setLoading(false);
@@ -163,20 +157,13 @@ export default function Auth() {
 
         const { error } = await signIn(formData.email, formData.password);
         if (error) {
-          // Handle specific error messages
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "Login Failed",
-              description: "Invalid email or password. Please try again.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Login Failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Login Failed",
+            description: error.message.includes("Invalid login credentials")
+              ? "Invalid email or password. Please try again."
+              : error.message,
+            variant: "destructive",
+          });
           setIsPostLoginRouting(false);
         } else {
           const [{ data: authUserData }, { data: sessionData }] = await Promise.all([
@@ -186,10 +173,7 @@ export default function Auth() {
           const signedInUser = authUserData.user;
           const signedInSession = sessionData.session;
 
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully logged in.",
-          });
+          toast({ title: "Welcome back!", description: "You have successfully logged in." });
 
           if (!signedInUser) {
             setIsPostLoginRouting(false);
@@ -198,40 +182,27 @@ export default function Auth() {
 
           const redirectUrl = localStorage.getItem("redirectAfterLogin") || homePath;
           localStorage.removeItem("redirectAfterLogin");
-          await routeUserAfterLogin(signedInUser.id, redirectUrl, signedInSession);
+          await routeUserAfterLogin(signedInUser.id, redirectUrl);
         }
       } else {
-        // Validate signup
+        // Sign up
         const result = signupSchema.safeParse(formData);
         if (!result.success) {
           const fieldErrors: Record<string, string> = {};
           result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              fieldErrors[err.path[0] as string] = err.message;
-            }
+            if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
           });
           setErrors(fieldErrors);
           setLoading(false);
           return;
         }
 
-        // Check if email already exists in this tenant's profile records.
-        const { data: emailExists, error: checkError } = await (supabase as any)
+        // Check if email already exists
+        const { data: emailExists } = await supabase
           .from("profiles")
           .select("id")
-          .eq("tenant_id", tenant!.id)
           .eq("email", formData.email)
           .maybeSingle();
-
-        if (checkError) {
-          toast({
-            title: "Error",
-            description: "Failed to check email availability.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
 
         if (emailExists) {
           setErrors({ email: "This email is already registered. Please log in instead." });
@@ -239,42 +210,32 @@ export default function Auth() {
           return;
         }
 
-const { error } = await signUp(
-  formData.email,
-  formData.password,
-  formData.name,
-  formData.department,
-  formData.year,
-  tenant?.id,
-);
+        const { error } = await signUp(
+          formData.email,
+          formData.password,
+          formData.name,
+          formData.role,
+          tenant?.id,
+        );
+
         if (error) {
-          // Handle specific error messages
           if (error.message.includes("already registered")) {
             setErrors({ email: "This email is already registered. Please log in instead." });
           } else {
-            toast({
-              title: "Sign Up Failed",
-              description: error.message,
-              variant: "destructive",
-            });
+            toast({ title: "Sign Up Failed", description: error.message, variant: "destructive" });
           }
         } else {
-          setVerificationSent(true);
           toast({
-            title: "Verification Email Sent",
-            description: "Please check your email and click the verification link to complete your registration.",
+            title: "Account Created!",
+            description: "You can now log in with your credentials.",
           });
+          setIsLogin(true);
+          setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
         }
       }
     } catch (err) {
-      if (isLogin) {
-        setIsPostLoginRouting(false);
-      }
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
+      if (isLogin) setIsPostLoginRouting(false);
+      toast({ title: "Error", description: "An unexpected error occurred. Please try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -284,87 +245,31 @@ const { error } = await signUp(
     <Layout>
       <section className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 bg-highlight">
         <div className="container mx-auto px-4">
-          <div className="max-w-md mx-auto">
+          <div className="max-w-lg mx-auto">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-foreground font-poppins font-bold text-2xl">C</span>
+                <span className="text-primary-foreground font-poppins font-bold text-2xl">S</span>
               </div>
               <h1 className="text-2xl font-poppins font-bold text-foreground">
                 {isLogin ? "Welcome Back" : "Create Account"}
               </h1>
               <p className="mt-2 text-muted-foreground">
                 {isLogin
-                  ? "Sign in to access problem statements and register your team"
-                  : "Join inCamp and start solving real-world problems"}
+                  ? "Sign in to the Societal Innovation Collaboration Portal"
+                  : "Join the platform connecting citizens, universities & industry"}
               </p>
             </div>
 
-            {/* Verification Sent Message */}
-            {verificationSent ? (
-              <div className="bg-card rounded-xl border border-border p-6 shadow-card text-center">
-                <div className="w-16 h-16 rounded-xl bg-green-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-poppins font-bold text-foreground mb-2">
-                  Check Your Email
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  We've sent a verification link to <strong>{formData.email}</strong>.
-                  Click the link in the email to complete your registration.
-                </p>
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => setVerificationSent(false)}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Back to Sign Up
-                  </Button>
-                  <Button
-                    onClick={async () => {
-const { error } = await signUp(
-  formData.email,
-  formData.password,
-  formData.name,
-  formData.department,
-  formData.year,
-  tenant?.id,
-);
-                      if (error) {
-                        toast({
-                          title: "Error",
-                          description: "Failed to resend verification email.",
-                          variant: "destructive",
-                        });
-                      } else {
-                        toast({
-                          title: "Verification Email Resent",
-                          description: "Please check your email again.",
-                        });
-                      }
-                    }}
-                    variant="default"
-                    className="w-full"
-                  >
-                    Resend Verification Email
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              /* Form Card */
-              <div className="bg-card rounded-xl border border-border p-6 shadow-card">
+            {/* Form Card */}
+            <div className="bg-card rounded-xl border border-border p-6 shadow-card">
               {/* Toggle Tabs */}
               <div className="flex rounded-lg bg-muted p-1 mb-6">
                 <button
                   type="button"
                   onClick={() => setIsLogin(true)}
                   className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                    isLogin
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                    isLogin ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <LogIn className="w-4 h-4" />
@@ -374,9 +279,7 @@ const { error } = await signUp(
                   type="button"
                   onClick={() => setIsLogin(false)}
                   className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                    !isLogin
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                    !isLogin ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <UserPlus className="w-4 h-4" />
@@ -385,7 +288,7 @@ const { error } = await signUp(
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Name field (signup only) */}
+                {/* Signup-only fields */}
                 {!isLogin && (
                   <>
                     <div className="space-y-2">
@@ -394,59 +297,45 @@ const { error } = await signUp(
                         id="name"
                         name="name"
                         type="text"
-                        placeholder="John Doe"
+                        placeholder="Your full name"
                         value={formData.name}
                         onChange={handleInputChange}
                         className={errors.name ? "border-destructive" : ""}
                       />
-                      {errors.name && (
-                        <p className="text-sm text-destructive">{errors.name}</p>
-                      )}
+                      {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="department">Department</Label>
-                        <select
-                          id="department"
-                          name="department"
-                          value={formData.department}
-                          onChange={handleInputChange}
-                          className={`w-full rounded-md border px-3 py-2 text-foreground transition focus:outline-none focus:ring-2 focus:ring-primary ${errors.department ? "border-destructive" : "border-border"}`}
-                        >
-                          <option value="">Select Department</option>
-                          <option value="AIML">AIML</option>
-                          <option value="CSE">CSE</option>
-                          <option value="ECE">ECE</option>
-                          <option value="EEE">EEE</option>
-                          <option value="MECH">MECH</option>
-                          <option value="CIVIL">CIVIL</option>
-                          <option value="MBA">MBA</option>
-                          <option value="PHARMACY">PHARMACY</option>
-                        </select>
-                        {errors.department && (
-                          <p className="text-sm text-destructive">{errors.department}</p>
-                        )}
+                    {/* Role selector */}
+                    <div className="space-y-2">
+                      <Label>I am a...</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {ROLE_OPTIONS.map((opt) => {
+                          const Icon = opt.icon;
+                          const isSelected = formData.role === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => {
+                                setFormData((prev) => ({ ...prev, role: opt.value }));
+                                if (errors.role) setErrors((prev) => ({ ...prev, role: "" }));
+                              }}
+                              className={`flex items-start gap-2 p-3 rounded-lg border text-left transition-all ${
+                                isSelected
+                                  ? "border-primary bg-primary/5 text-primary"
+                                  : "border-border hover:border-primary/50 text-foreground"
+                              }`}
+                            >
+                              <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                              <div>
+                                <p className="text-xs font-semibold leading-tight">{opt.label}</p>
+                                <p className="text-xs text-muted-foreground leading-tight mt-0.5">{opt.description}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="year">Year of Study</Label>
-                        <select
-                          id="year"
-                          name="year"
-                          value={formData.year}
-                          onChange={handleInputChange}
-                          className={`w-full rounded-md border px-3 py-2 text-foreground transition focus:outline-none focus:ring-2 focus:ring-primary ${errors.year ? "border-destructive" : "border-border"}`}
-                        >
-                          <option value="">Select Year</option>
-                          <option value="1">1st Year</option>
-                          <option value="2">2nd Year</option>
-                          <option value="3">3rd Year</option>
-                          <option value="4">4th Year</option>
-                        </select>
-                        {errors.year && (
-                          <p className="text-sm text-destructive">{errors.year}</p>
-                        )}
-                      </div>
+                      {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
                     </div>
                   </>
                 )}
@@ -463,9 +352,7 @@ const { error } = await signUp(
                     onChange={handleInputChange}
                     className={errors.email ? "border-destructive" : ""}
                   />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
 
                 {/* Password */}
@@ -489,9 +376,7 @@ const { error } = await signUp(
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
-                  )}
+                  {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
 
                 {/* Confirm Password (signup only) */}
@@ -513,7 +398,7 @@ const { error } = await signUp(
                   </div>
                 )}
 
-                {/* Submit Button */}
+                {/* Submit */}
                 <Button
                   type="submit"
                   variant="orange"
@@ -528,23 +413,34 @@ const { error } = await signUp(
                 </Button>
               </form>
 
-                {/* Toggle Link */}
-                <p className="mt-6 text-center text-sm text-muted-foreground">
-                  {isLogin ? "Don't have an account? " : "Already have an account? "}
-                  <button
-                    type="button"
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="text-primary hover:text-secondary font-medium"
+              {/* Toggle Link */}
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <button
+                  type="button"
+                  onClick={() => { setIsLogin(!isLogin); setErrors({}); }}
+                  className="text-primary hover:text-secondary font-medium"
+                >
+                  {isLogin ? "Sign up" : "Sign in"}
+                </button>
+              </p>
+
+              {/* Public submission note */}
+              {!isLogin && (
+                <p className="mt-3 text-center text-xs text-muted-foreground border-t border-border pt-3">
+                  Want to submit a problem without an account?{" "}
+                  <a
+                    href={tenantPath(tenant?.slug || "", "/submit")}
+                    className="text-primary hover:underline font-medium"
                   >
-                    {isLogin ? "Sign up" : "Sign in"}
-                  </button>
+                    Submit anonymously →
+                  </a>
                 </p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </section>
     </Layout>
   );
 }
-
