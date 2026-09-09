@@ -220,7 +220,7 @@ export default function Problems() {
         category,
         theme,
         department_id: department_id,
-        max_registrations: max_registrations != null && max_registrations !== "" ? Number(max_registrations) : null,
+        max_registrations: max_registrations != null && String(max_registrations).trim() !== "" ? Number(max_registrations) : null,
       };
 
       if (selectedProblem) {
@@ -635,7 +635,12 @@ export default function Problems() {
               Register your team and start working on your innovative solution today.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild variant="heroOutline" size="lg">
+              <Button
+                asChild
+                variant="heroOutline"
+                size="lg"
+                className="border-2 border-white/90 text-white hover:bg-white hover:text-primary transition-all duration-200"
+              >
                 <Link to={tenantPath(tenant!.slug, "/resources")}>Download Resources</Link>
               </Button>
               <Button asChild variant="orange" size="lg">
