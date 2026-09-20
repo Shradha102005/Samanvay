@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -233,7 +233,7 @@ try {
 
         setProblems(problemsData);
 
-        const mergedUsers = profilesData.map((profile) => ({
+        const mergedUsers = (profilesData as any[]).map((profile: any) => ({
           ...profile,
           role: rolesData.find((role) => role.user_id === profile.id)?.role || profile.role || "student",
         }));

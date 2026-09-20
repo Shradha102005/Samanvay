@@ -11,17 +11,34 @@ interface TeamRegistration {
   problem_id: string;
   member1_name: string;
   member1_roll: string;
+  member1_year: string;
+  member1_department: string;
+  member1_phone: string;
+  member1_email: string;
   member2_name?: string;
   member2_roll?: string;
+  member2_year?: string;
+  member2_department?: string;
+  member2_phone?: string;
+  member2_email?: string;
   member3_name?: string;
   member3_roll?: string;
+  member3_year?: string;
+  member3_department?: string;
+  member3_phone?: string;
+  member3_email?: string;
   member4_name?: string;
   member4_roll?: string;
-  year: string;
-  department: string;
-  phone: string;
-  email: string;
+  member4_year?: string;
+  member4_department?: string;
+  member4_phone?: string;
+  member4_email?: string;
+  year?: string;
+  department?: string;
+  phone?: string;
+  email?: string;
   document_url?: string;
+  document_filename?: string;
   created_at: string;
   problem_title?: string;
   theme?: string;
@@ -54,16 +71,16 @@ export function TeamFormDialog({
     problem_id: "",
     member1_name: "",
     member1_roll: "",
+    member1_year: "",
+    member1_department: "",
+    member1_phone: "",
+    member1_email: "",
     member2_name: "",
     member2_roll: "",
     member3_name: "",
     member3_roll: "",
     member4_name: "",
     member4_roll: "",
-    year: "",
-    department: "",
-    phone: "",
-    email: "",
     document_url: "",
   });
 
@@ -74,16 +91,16 @@ export function TeamFormDialog({
         problem_id: team.problem_id,
         member1_name: team.member1_name,
         member1_roll: team.member1_roll,
+        member1_year: team.member1_year || "",
+        member1_department: team.member1_department || "",
+        member1_phone: team.member1_phone || "",
+        member1_email: team.member1_email || "",
         member2_name: team.member2_name || "",
         member2_roll: team.member2_roll || "",
         member3_name: team.member3_name || "",
         member3_roll: team.member3_roll || "",
         member4_name: team.member4_name || "",
         member4_roll: team.member4_roll || "",
-        year: team.year,
-        department: team.department,
-        phone: team.phone,
-        email: team.email,
         document_url: team.document_url || "",
       });
     } else {
@@ -92,16 +109,16 @@ export function TeamFormDialog({
         problem_id: "",
         member1_name: "",
         member1_roll: "",
+        member1_year: "",
+        member1_department: "",
+        member1_phone: "",
+        member1_email: "",
         member2_name: "",
         member2_roll: "",
         member3_name: "",
         member3_roll: "",
         member4_name: "",
         member4_roll: "",
-        year: "",
-        department: "",
-        phone: "",
-        email: "",
         document_url: "",
       });
     }
@@ -150,141 +167,66 @@ export function TeamFormDialog({
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="member1_name">Member 1 Name</Label>
-              <Input
-                id="member1_name"
-                value={formData.member1_name}
-                onChange={(e) => setFormData({ ...formData, member1_name: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="member1_roll">Member 1 Roll</Label>
-              <Input
-                id="member1_roll"
-                value={formData.member1_roll}
-                onChange={(e) => setFormData({ ...formData, member1_roll: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="member2_name">Member 2 Name</Label>
-              <Input
-                id="member2_name"
-                value={formData.member2_name}
-                onChange={(e) => setFormData({ ...formData, member2_name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="member2_roll">Member 2 Roll</Label>
-              <Input
-                id="member2_roll"
-                value={formData.member2_roll}
-                onChange={(e) => setFormData({ ...formData, member2_roll: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="member3_name">Member 3 Name</Label>
-              <Input
-                id="member3_name"
-                value={formData.member3_name}
-                onChange={(e) => setFormData({ ...formData, member3_name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="member3_roll">Member 3 Roll</Label>
-              <Input
-                id="member3_roll"
-                value={formData.member3_roll}
-                onChange={(e) => setFormData({ ...formData, member3_roll: e.target.value })}
-              />
+
+          {/* Member 1 — full details */}
+          <div className="border rounded-lg p-3 space-y-3">
+            <p className="font-medium text-sm">Member 1 (Team Leader)</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Name</Label>
+                <Input value={formData.member1_name} onChange={(e) => setFormData({ ...formData, member1_name: e.target.value })} required />
+              </div>
+              <div>
+                <Label>Roll No.</Label>
+                <Input value={formData.member1_roll} onChange={(e) => setFormData({ ...formData, member1_roll: e.target.value })} required />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input value={formData.member1_phone} onChange={(e) => setFormData({ ...formData, member1_phone: e.target.value })} required />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={formData.member1_email} onChange={(e) => setFormData({ ...formData, member1_email: e.target.value })} required />
+              </div>
+              <div>
+                <Label>Year</Label>
+                <Select value={formData.member1_year} onValueChange={(v) => setFormData({ ...formData, member1_year: v })}>
+                  <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1st Year">1st Year</SelectItem>
+                    <SelectItem value="2nd Year">2nd Year</SelectItem>
+                    <SelectItem value="3rd Year">3rd Year</SelectItem>
+                    <SelectItem value="4th Year">4th Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Department</Label>
+                <Input value={formData.member1_department} onChange={(e) => setFormData({ ...formData, member1_department: e.target.value })} required />
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="member4_name">Member 4 Name</Label>
-              <Input
-                id="member4_name"
-                value={formData.member4_name}
-                onChange={(e) => setFormData({ ...formData, member4_name: e.target.value })}
-              />
+
+          {/* Members 2–4 — name + roll only */}
+          {([2, 3, 4] as const).map((n) => (
+            <div key={n} className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>{`Member ${n} Name`}</Label>
+                <Input
+                  value={(formData as any)[`member${n}_name`]}
+                  onChange={(e) => setFormData({ ...formData, [`member${n}_name`]: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>{`Member ${n} Roll`}</Label>
+                <Input
+                  value={(formData as any)[`member${n}_roll`]}
+                  onChange={(e) => setFormData({ ...formData, [`member${n}_roll`]: e.target.value })}
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="member4_roll">Member 4 Roll</Label>
-              <Input
-                id="member4_roll"
-                value={formData.member4_roll}
-                onChange={(e) => setFormData({ ...formData, member4_roll: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="year">Year</Label>
-              <Select
-                value={formData.year}
-                onValueChange={(value) => setFormData({ ...formData, year: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1st Year">1st Year</SelectItem>
-                  <SelectItem value="2nd Year">2nd Year</SelectItem>
-                  <SelectItem value="3rd Year">3rd Year</SelectItem>
-                  <SelectItem value="4th Year">4th Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="department">Department</Label>
-              <Select
-                value={formData.department}
-                onValueChange={(value) => setFormData({ ...formData, department: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Computer Science">Computer Science</SelectItem>
-                  <SelectItem value="Information Technology">Information Technology</SelectItem>
-                  <SelectItem value="Electronics">Electronics</SelectItem>
-                  <SelectItem value="Mechanical">Mechanical</SelectItem>
-                  <SelectItem value="Civil">Civil</SelectItem>
-                  <SelectItem value="Electrical">Electrical</SelectItem>
-                  <SelectItem value="Business Administration">Business Administration</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-          </div>
+          ))}
+
           <div>
             <Label htmlFor="document_url">Document URL</Label>
             <Input
