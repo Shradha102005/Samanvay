@@ -47,12 +47,9 @@ const defaultHeroContent: HeroContent = {
   backImage: "/back.png",
   sliderImages: [
     "/BackgroundSlider1.jpeg",
-    "/BackgroundSlider2.JPG",
-    "/BackgroundSlider3.JPG",
+    "/BackgroundSlider2.jpeg",
+    "/BackgroundSlider3.jpeg",
     "/BackgroundSlider4.jpeg",
-    "/BackgroundSlider5.jpeg",
-    "/BackgroundSlider6.jpeg",
-    "/BackgroundSlider7.jpeg",
   ],
   heroStyles: {
     title: {
